@@ -4,7 +4,12 @@ import Wrapper from '../../assets/wrappers/DashboardFormPage';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import FormRowSelect from '../../components/FormRowSelect';
-import { handleChange, clearValues, createJob } from '../../features/job/jobSlice';
+import {
+  handleChange,
+  clearValues,
+  createJob,
+  editJob,
+} from '../../features/job/jobSlice';
 
 const AddJob = () => {
   const {
@@ -30,6 +35,21 @@ const AddJob = () => {
       toast.error('Please Fill Out All Fields');
       return;
     }
+    if (isEditing) {
+      dispatch(
+        editJob({
+          jobId: editJobId,
+          job: {
+            position,
+            company,
+            jobLocation,
+            jobType,
+            status,
+          },
+        })
+      );
+      return;
+    }
     dispatch(createJob({ position, company, jobLocation, jobType, status }));
   };
   const handleJobInput = (e) => {
@@ -39,7 +59,8 @@ const AddJob = () => {
   };
 
   useEffect(() => {
-    // eventually will check for isEditing
+    // when adding job and not editing we use user's location, when editing we use the location
+    // in the db
     if (!isEditing) {
       dispatch(handleChange({ name: 'jobLocation', value: user.location }));
     }
